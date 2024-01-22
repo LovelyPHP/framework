@@ -40,7 +40,7 @@ jobs:
           command: composer update --prefer-dist --no-interaction --prefer-stable --no-suggest
 
       - name: Execute tests
-        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+        run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml --migrate-configuration
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
