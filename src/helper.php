@@ -13,6 +13,8 @@
 // LovelyPHP 助手函数
 //-------------------------
 
+require 'lovely/App.php';
+
 if (!function_exists('abort')) {
     /**
      * 抛出HTTP异常
