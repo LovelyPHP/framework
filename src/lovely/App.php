@@ -229,17 +229,22 @@ class App extends Container
 
         return count($filteredServices) > 0 ? reset($filteredServices) : null;}
 
-    /**
-     * 开启应用调试模式
-     * @access public
-     * @param bool $debug 开启应用调试模式
-     * @return $this
-     */
-    public function debug(bool $debug = true)
-    {
-        $this->appDebug = $debug;
-        return $this;
-    }
+        /**
+         * 开启应用调试模式
+         * @access public
+         * @param bool|null $debug 开启应用调试模式
+         * @return $this
+         */
+        public function debug($debug = true)
+        {
+            if (!is_bool($debug)) {
+                $debug = true;
+            }
+
+            $this->appDebug = $debug;
+            return $this;
+        }
+
 
     /**
      * 是否为调试模式
