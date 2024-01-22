@@ -238,7 +238,7 @@ if (!function_exists('input')) {
         if (strpos($key, '.') !== false) {
             // 指定参数来源
             list($method, $key) = explode('.', $key, 2);
-            if (in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'])) {
+            if (in_array($method, array('get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'))) {
                 if ($method === 'server' && is_null($default)) {
                     $default = '';
                 }
@@ -250,9 +250,11 @@ if (!function_exists('input')) {
             $method = 'param';
         }
 
+        $request = request();
+
         return $has ?
-            request()->has($key, $method) :
-            request()->$method($key, $default, $filter);
+            $request->has($key, $method) :
+            $request->$method($key, $default, $filter);
     }
 }
 
