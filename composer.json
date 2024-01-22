@@ -20,23 +20,19 @@
     },
     "require-dev": {},
     "autoload": {
+        "files": [],
         "psr-4": {
-            "app\\": "app"
-        },
-        "psr-0": {
-            "": "extend/"
+            "lovely\\": "src/lovely/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "lovely\\tests\\": "tests/"
         }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "sort-packages": true,
-        "preferred-install": "dist"
-    },
-    "scripts": {
-        "post-autoload-dump": [
-            "@php lovely service:discover",
-            "@php lovely vendor:publish"
-        ]
+        "sort-packages": true
     }
 }
