@@ -265,7 +265,7 @@ if (!function_exists('invoke')) {
      * @param array $args 参数
      * @return mixed
      */
-    function invoke($call, array $args = [])
+    function invoke($call, array $args = array())
     {
         $container = Container::getInstance();
         
