@@ -208,7 +208,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @param string $name 类名或者标识
      * @return bool
      */
-    public function has($name)
+    public function has($name): bool
     {
         return $this->bound($name);
     }
