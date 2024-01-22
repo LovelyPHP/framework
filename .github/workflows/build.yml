@@ -47,4 +47,7 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
-          cli-args: "--format=php-clover build/logs/clover.xml --revision=${{ github.event.pull_request.head.sha || github.sha }}"
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./build/logs/clover.xml
+          flags: phpunit
+          name: phpunit
