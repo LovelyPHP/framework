@@ -682,7 +682,17 @@ if (!function_exists('throw_if')) {
         $parameters = array_slice(func_get_args(), 2);
 
         if ($condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+            if (is_string($exception)) {
+                $exceptionClass = $exception;
+                $exception = new $exceptionClass();
+            }
+
+            if (!empty($parameters)) {
+                $reflection = new ReflectionMethod($exception, '__construct');
+                $exception = $reflection->invokeArgs($exception, $parameters);
+            }
+
+            throw $exception;
         }
 
         return $condition;
@@ -703,7 +713,17 @@ if (!function_exists('throw_unless')) {
         $parameters = array_slice(func_get_args(), 2);
 
         if (!$condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+            if (is_string($exception)) {
+                $exceptionClass = $exception;
+                $exception = new $exceptionClass();
+            }
+
+            if (!empty($parameters)) {
+                $reflection = new ReflectionMethod($exception, '__construct');
+                $exception = $reflection->invokeArgs($exception, $parameters);
+            }
+
+            throw $exception;
         }
 
         return $condition;
