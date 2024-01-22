@@ -18,7 +18,7 @@ LovelyPHP 目前使用 Git 来控制程序版本，如果你想为 LovelyPHP 贡
 * 本项目代码格式化标准选用 [**PSR-2**](http://www.kancloud.cn/thinkphp/php-fig-psr/3141)；
 * 类名和类文件名遵循 [**PSR-4**](http://www.kancloud.cn/thinkphp/php-fig-psr/3144)；
 * 对于 Issues 的处理，请使用诸如 `fix #xxx(Issue ID)` 的 commit title 直接关闭 issue。
-* 系统会自动在 PHP 5.3 ~ 8.2 上测试修改，请确保你的修改符合 PHP 5.3 ~ 8.2 的语法规范；
+* 系统会自动在 PHP 5.4 ~ 8.2 上测试修改，请确保你的修改符合 PHP 5.4 ~ 8.2 的语法规范；
 * 管理员不会合并造成 CI faild 的修改，若出现 CI faild 请检查自己的源代码或修改相应的[单元测试文件](tests)；
 
 ## GitHub Issue
@@ -80,7 +80,7 @@ GitHub 提供了 Issue 功能，该功能可以用于：
 或自行安装
 
 - Apache / Nginx
-- PHP 5.3 ~ 8.2
+- PHP 5.4 ~ 8.2
 - MySQL / MariaDB
 
 *Windows 用户推荐添加 PHP bin 目录到 PATH，方便使用 composer*

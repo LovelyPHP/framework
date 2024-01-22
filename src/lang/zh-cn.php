@@ -10,7 +10,7 @@
 // +----------------------------------------------------------------------
 
 // 核心中文语言包
-return array(
+return [
     // 系统错误提示
     'Undefined variable'                                        => '未定义变量(T＿T)',
     'Undefined index'                                           => '未定义数组索引(T＿T)',
@@ -149,5 +149,5 @@ return array(
     'not conform to the rules'                                  => '规则错误(T＿T)',
 
     'record has update'                                         => '记录已经被更新啦(* ^ ω ^)',
-);
+];
 ?>

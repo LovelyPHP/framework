@@ -8,6 +8,16 @@
 // +----------------------------------------------------------------------
 // | Author: MoeCinnamo <abcd2890000456@gmail.com>
 // +----------------------------------------------------------------------
+declare(strict_types=1);
+
+namespace lovely;
+
+//use Composer\InstalledVersions;
+//use lovely\event\AppInit;
+//use lovely\helper\Str;
+//use lovely\initializer\BootService;
+//use lovely\initializer\Error;
+//use lovely\initializer\RegisterService;
 
 /**
  * App 基础类
@@ -111,7 +121,7 @@ class App extends Container
      * 注册的系统服务
      * @var array
      */
-    protected $services = array();
+    protected $services = [];
 
     /**
      * 初始化
@@ -157,19 +167,19 @@ class App extends Container
      */
     public function __construct($rootPath = '')
     {
-        $this->lovelyPath   = realpath(dirname(__DIR__)) . DIRECTORY_SEPARATOR;
-        $this->rootPath    = $rootPath ? rtrim($rootPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR : $this->getDefaultRootPath();
-        $this->appPath     = $this->rootPath . 'app' . DIRECTORY_SEPARATOR;
+        $this->thinkPath = realpath(dirname(__DIR__)) . DIRECTORY_SEPARATOR;
+        $this->rootPath = $rootPath ? rtrim($rootPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR : $this->getDefaultRootPath();
+        $this->appPath = $this->rootPath . 'app' . DIRECTORY_SEPARATOR;
         $this->runtimePath = $this->rootPath . 'runtime' . DIRECTORY_SEPARATOR;
 
         if (is_file($this->appPath . 'provider.php')) {
             $this->bind(include $this->appPath . 'provider.php');
         }
 
+        static::setInstance($this);
+
         $this->instance('app', $this);
         $this->instance('lovely\Container', $this);
-
-        $this->initialize();
     }
 
     /**
@@ -208,13 +218,13 @@ class App extends Container
      * @param Service $service 服务
      * @return mixed
      */
-    public function bootService($service)
+    public function bootService(Service $service)
     {
         if (method_exists($service, 'boot')) {
-            return $this->invoke(array($service, 'boot'));
+            return $this->invoke([$service, 'boot']);
         }
     }
-    
+
     /**
      * 获取服务
      * @param string|Service $service
@@ -222,38 +232,56 @@ class App extends Container
      */
     public function getService($service)
     {
-        $name = is_string($service) ? $service : get_class($service);
+        $name = is_string($service) ? $service : $service::class;
         $filteredServices = array_filter($this->services, function ($value) use ($name) {
             return $value instanceof $name;
         });
 
-        return count($filteredServices) > 0 ? reset($filteredServices) : null;}
+        return reset($filteredServices) ?: null;
+    }
 
-        /**
-         * 开启应用调试模式
-         * @access public
-         * @param bool|null $debug 开启应用调试模式
-         * @return $this
-         */
-        public function debug($debug = true)
-        {
-            if (!is_bool($debug)) {
-                $debug = true;
-            }
-
-            $this->appDebug = $debug;
-            return $this;
-        }
-
+    /**
+     * 开启应用调试模式
+     * @access public
+     * @param bool $debug 开启应用调试模式
+     * @return $this
+     */
+    public function debug($debug = true)
+    {
+        $this->appDebug = $debug;
+        return $this;
+    }
 
     /**
      * 是否为调试模式
      * @access public
      * @return bool
      */
-    public function isDebug(): bool
+    public function isDebug()
     {
         return $this->appDebug;
+    }
+
+    /**
+     * 设置应用命名空间
+     * @access public
+     * @param string $namespace 应用命名空间
+     * @return $this
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
+
+    /**
+     * 获取应用类库命名空间
+     * @access public
+     * @return string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
     }
 
     /**
@@ -278,13 +306,12 @@ class App extends Container
         return ltrim(InstalledVersions::getPrettyVersion('lovelyphp/framework'), 'v');
     }
 
-
     /**
      * 获取应用根目录
      * @access public
      * @return string
      */
-    public function getRootPath(): string
+    public function getRootPath()
     {
         return $this->rootPath;
     }
@@ -294,7 +321,7 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getBasePath(): string
+    public function getBasePath()
     {
         return $this->rootPath . 'app' . DIRECTORY_SEPARATOR;
     }
@@ -304,7 +331,7 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getAppPath(): string
+    public function getAppPath()
     {
         return $this->appPath;
     }
@@ -313,7 +340,7 @@ class App extends Container
      * 设置应用目录
      * @param string $path 应用目录
      */
-    public function setAppPath(string $path)
+    public function setAppPath($path)
     {
         $this->appPath = $path;
     }
@@ -323,7 +350,7 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getRuntimePath(): string
+    public function getRuntimePath()
     {
         return $this->runtimePath;
     }
@@ -332,7 +359,7 @@ class App extends Container
      * 设置runtime目录
      * @param string $path 定义目录
      */
-    public function setRuntimePath(string $path): void
+    public function setRuntimePath($path)
     {
         $this->runtimePath = $path;
     }
@@ -342,7 +369,7 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getLovelyPath(): string
+    public function getLovelyPath()
     {
         return $this->lovelyPath;
     }
@@ -352,7 +379,7 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getConfigPath(): string
+    public function getConfigPath()
     {
         return $this->rootPath . 'config' . DIRECTORY_SEPARATOR;
     }
@@ -362,7 +389,7 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getConfigExt(): string
+    public function getConfigExt()
     {
         return $this->configExt;
     }
@@ -372,7 +399,7 @@ class App extends Container
      * @access public
      * @return float
      */
-    public function getBeginTime(): float
+    public function getBeginTime()
     {
         return $this->beginTime;
     }
@@ -382,7 +409,7 @@ class App extends Container
      * @access public
      * @return integer
      */
-    public function getBeginMem(): int
+    public function getBeginMem()
     {
         return $this->beginMem;
     }
@@ -393,12 +420,12 @@ class App extends Container
      * @param string $envName 环境标识
      * @return void
      */
-    public function loadEnv(string $envName = ''): void
+    public function loadEnv($envName = '')
     {
-        // 加载环境变量
+       // 加载环境变量
         $envFile = $envName ? $this->rootPath . '.env.' . $envName : $this->rootPath . '.env';
 
-        if (is_file($envFile)) {
+           if (is_file($envFile)) {
             $this->env->load($envFile);
         }
     }
@@ -411,38 +438,35 @@ class App extends Container
     public function initialize()
     {
         $this->initialized = true;
+
         $this->beginTime = microtime(true);
         $this->beginMem  = memory_get_usage();
+
         $this->loadEnv($this->envName);
 
-    $configExt = $this->env->get('config_ext');
-    $this->configExt = $configExt ? $configExt : '.php';
+        $this->configExt = $this->env->get('config_ext', '.php');
 
-    $this->debugModeInit();
+        $this->debugModeInit();
 
-    // 加载全局初始化文件
-    $this->load();
+        // 加载全局初始化文件
+        $this->load();
 
-    // 加载应用默认语言包
-    $this->loadLangPack();
+        // 加载应用默认语言包
+        $this->loadLangPack();
 
-    // 监听AppInit
-    $this->event->trigger(AppInit::class);
+        // 监听AppInit
+        $this->event->trigger(AppInit::class);
 
-    date_default_timezone_set($this->config->get('app.default_timezone', 'Asia/Shanghai'));
+        date_default_timezone_set($this->config->get('app.default_timezone', 'Asia/Shanghai'));
 
-    // 初始化
-    foreach ($this->initializers as $initializer) {
-        $initializerInstance = $this->make($initializer);
-        
-        if (method_exists($initializerInstance, 'init')) {
-            $initializerInstance->init($this);
+        // 初始化
+        foreach ($this->initializers as $initializer) {
+            $initializerObj = new $initializer();
+            $initializerObj->init($this);
         }
+
+        return $this;
     }
-
-    return $this;
-}
-
 
     /**
      * 是否初始化过
@@ -457,7 +481,7 @@ class App extends Container
      * 加载语言包
      * @return void
      */
-    public function loadLangPack(): void
+    public function loadLangPack()
     {
         // 加载默认语言包
         $langSet = $this->lang->defaultLangSet();
@@ -469,11 +493,11 @@ class App extends Container
      * @access public
      * @return void
      */
-    public function boot(): void
+    public function boot()
     {
-        array_walk($this->services, function ($service) {
+        foreach ($this->services as $service) {
             $this->bootService($service);
-        });
+        }
     }
 
     /**
@@ -481,7 +505,7 @@ class App extends Container
      * @access protected
      * @return void
      */
-    protected function load(): void
+    protected function load()
     {
         $appPath = $this->getAppPath();
 
@@ -491,9 +515,9 @@ class App extends Container
 
         include_once $this->lovelyPath . 'helper.php';
 
-        $configPath = $this->getConfigPath();
+       $configPath = $this->getConfigPath();
 
-        $files = [];
+       $files = [];
 
         if (is_dir($configPath)) {
             $files = glob($configPath . '*' . $this->configExt);
@@ -520,13 +544,13 @@ class App extends Container
      * @access protected
      * @return void
      */
-    protected function debugModeInit(): void
+    protected function debugModeInit()
     {
         // 应用调试模式
         if (!$this->appDebug) {
             $this->appDebug = $this->env->get('app_debug') ? true : false;
-            ini_set('display_errors', 'Off');
-        }
+           ini_set('display_errors', 'Off');
+       }
 
         if (!$this->runningInConsole()) {
             //重新申请一块比较大的buffer
@@ -534,7 +558,7 @@ class App extends Container
                 $output = ob_get_clean();
             }
             ob_start();
-            if (!empty($output)) {
+           if (!empty($output)) {
                 echo $output;
             }
         }
@@ -546,7 +570,7 @@ class App extends Container
      * @param array $event 事件数据
      * @return void
      */
-    public function loadEvent(array $event): void
+    public function loadEvent(array $event)
     {
         if (isset($event['bind'])) {
             $this->event->bind($event['bind']);
@@ -568,7 +592,7 @@ class App extends Container
      * @param string $name  类名
      * @return string
      */
-    public function parseClass(string $layer, string $name): string
+    public function parseClass($layer, $name)
     {
         $name  = str_replace(['/', '.'], '\\', $name);
         $array = explode('\\', $name);
@@ -582,7 +606,7 @@ class App extends Container
      * 是否运行在命令行下
      * @return bool
      */
-    public function runningInConsole(): bool
+    public function runningInConsole()
     {
         return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
     }
@@ -592,8 +616,9 @@ class App extends Container
      * @access protected
      * @return string
      */
-    protected function getDefaultRootPath(): string
+    protected function getDefaultRootPath()
     {
         return dirname($this->lovelyPath, 4) . DIRECTORY_SEPARATOR;
     }
 }
+?>

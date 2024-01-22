@@ -8,21 +8,44 @@
 // +----------------------------------------------------------------------
 // | Author: MoeCinnamo <abcd2890000456@gmail.com>
 // +----------------------------------------------------------------------
+declare(strict_types=1);
 
 //------------------------
 // LovelyPHP 助手函数
 //-------------------------
 
-require 'lovely/App.php';
+use lovely\App;
+use lovely\Container;
+//use lovely\exception\HttpException;
+//use lovely\exception\HttpResponseException;
+//use lovely\facade\Cache;
+//use lovely\facade\Config;
+//use lovely\facade\Cookie;
+//use lovely\facade\Env;
+//use lovely\facade\Event;
+//use lovely\facade\Lang;
+//use lovely\facade\Log;
+//use lovely\facade\Request;
+//use lovely\facade\Route;
+//use lovely\facade\Session;
+//use lovely\Response;
+//use lovely\response\File;
+//use lovely\response\Json;
+//use lovely\response\Jsonp;
+//use lovely\response\Redirect;
+//use lovely\response\View;
+//use lovely\response\Xml;
+//use lovely\route\Url as UrlBuild;
+//use lovely\Validate;
 
 if (!function_exists('abort')) {
     /**
      * 抛出HTTP异常
-     * @param mixed   $code    状态码 或者 Response对象实例
-     * @param string  $message 错误信息
-     * @param array   $header  参数
+     * @param integer|Response $code    状态码 或者 Response对象实例
+     * @param string           $message 错误信息
+     * @param array            $header  参数
      */
-    function abort($code, $message = '', $header = array())
+    function abort($code, $message = '', $header = [])
     {
         if ($code instanceof Response) {
             throw new HttpResponseException($code);
@@ -35,12 +58,12 @@ if (!function_exists('abort')) {
 if (!function_exists('app')) {
     /**
      * 快速获取容器中的实例 支持依赖注入
-     * @param string|class-string $name        类名或标识 默认获取当前应用实例
-     * @param array                $args        参数
-     * @param bool                 $newInstance 是否每次创建新的实例
+     * @param string $name        类名或标识 默认获取当前应用实例
+     * @param array  $args        参数
+     * @param bool   $newInstance 是否每次创建新的实例
      * @return object|App
      */
-    function app($name = '', $args = array(), $newInstance = false)
+    function app($name = '', $args = [], $newInstance = false)
     {
         return Container::getInstance()->make($name ?: 'App', $args, $newInstance);
     }
@@ -126,8 +149,8 @@ if (!function_exists('cookie')) {
     {
         if (is_null($value)) {
             // 删除
-            Cookie::delete($name, $option !== null ? $option : array());
-        } elseif ($value === '') {
+            Cookie::delete($name, $option ?: []);
+        } elseif ('' === $value) {
             // 获取
             return strpos($name, '?') === 0 ? Cookie::has(substr($name, 1)) : Cookie::get($name);
         } else {
@@ -155,14 +178,13 @@ if (!function_exists('download')) {
 if (!function_exists('dump')) {
     /**
      * 浏览器友好的变量输出
+     * @param mixed $vars 要输出的变量
      * @return void
      */
     function dump()
     {
-        $vars = func_get_args();
-
         ob_start();
-        call_user_func_array('var_dump', $vars);
+        call_user_func_array('var_dump', func_get_args());
 
         $output = ob_get_clean();
         $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
@@ -190,7 +212,7 @@ if (!function_exists('env')) {
      */
     function env($name = null, $default = null)
     {
-        return is_null($name) ? $_ENV : (isset($_ENV[$name]) ? $_ENV[$name] : $default);
+        return Env::get($name, $default);
     }
 }
 
@@ -214,8 +236,7 @@ if (!function_exists('halt')) {
      */
     function halt()
     {
-        $vars = func_get_args();
-        call_user_func_array('dump', $vars);
+        call_user_func_array('dump', func_get_args());
 
         throw new HttpResponseException(Response::create());
     }
@@ -231,17 +252,17 @@ if (!function_exists('input')) {
      */
     function input($key = '', $default = null, $filter = '')
     {
-        $has = false;
-        if (strpos($key, '?') === 0) {
+        if (str_starts_with($key, '?')) {
             $key = substr($key, 1);
             $has = true;
         }
 
-        if (strpos($key, '.') !== false) {
+        if ($pos = strpos($key, '.')) {
             // 指定参数来源
-            list($method, $key) = explode('.', $key, 2);
-            if (in_array($method, array('get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'))) {
-                if ($method === 'server' && is_null($default)) {
+            $method = substr($key, 0, $pos);
+            if (in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'])) {
+                $key = substr($key, $pos + 1);
+                if ('server' == $method && is_null($default)) {
                     $default = '';
                 }
             } else {
@@ -252,11 +273,9 @@ if (!function_exists('input')) {
             $method = 'param';
         }
 
-        $request = request();
-
-        return $has ?
-            $request->has($key, $method) :
-            $request->$method($key, $default, $filter);
+        return isset($has) ?
+            Request::has($key, $method) :
+            Request::$method($key, $default, $filter);
     }
 }
 
@@ -267,10 +286,10 @@ if (!function_exists('invoke')) {
      * @param array $args 参数
      * @return mixed
      */
-    function invoke($call, array $args = array())
+    function invoke($call, array $args = [])
     {
         $container = Container::getInstance();
-        
+
         if (is_callable($call)) {
             return $container->invoke($call, $args);
         }
@@ -288,11 +307,12 @@ if (!function_exists('json')) {
      * @param array $options 参数
      * @return \lovely\response\Json
      */
-    function json($data = array(), $code = 200, $header = array(), $options = array())
+    function json($data = [], $code = 200, $header = [], $options = [])
     {
         return Response::create($data, 'json', $code)->header($header)->options($options);
     }
 }
+
 if (!function_exists('jsonp')) {
     /**
      * 获取\lovely\response\Jsonp对象实例
@@ -302,7 +322,7 @@ if (!function_exists('jsonp')) {
      * @param array $options 参数
      * @return \lovely\response\Jsonp
      */
-    function jsonp($data = array(), $code = 200, $header = array(), $options = array())
+    function jsonp($data = [], $code = 200, $header = [], $options = [])
     {
         return Response::create($data, 'jsonp', $code)->header($header)->options($options);
     }
@@ -316,7 +336,7 @@ if (!function_exists('lang')) {
      * @param string $lang 语言
      * @return mixed
      */
-    function lang($name, $vars = array(), $lang = '')
+    function lang($name, array $vars = [], $lang = '')
     {
         return Lang::get($name, $vars, $lang);
     }
@@ -334,7 +354,9 @@ if (!function_exists('parse_name')) {
     function parse_name($name, $type = 0, $ucfirst = true)
     {
         if ($type) {
-            $name = preg_replace_callback('/_([a-zA-Z])/', create_function('$match', 'return strtoupper($match[1]);'), $name);
+            $name = preg_replace_callback('/_([a-zA-Z])/', function ($match) {
+                return strtoupper($match[1]);
+            }, $name);
 
             return $ucfirst ? ucfirst($name) : lcfirst($name);
         }
@@ -359,7 +381,7 @@ if (!function_exists('redirect')) {
 if (!function_exists('request')) {
     /**
      * 获取当前Request对象实例
-     * @return \lovely\Request
+     * @return Request
      */
     function request()
     {
@@ -376,7 +398,7 @@ if (!function_exists('response')) {
      * @param string     $type
      * @return Response
      */
-    function response($data = '', $code = 200, $header = array(), $type = 'html')
+    function response($data = '', $code = 200, $header = [], $type = 'html')
     {
         return Response::create($data, $type, $code)->header($header);
     }
@@ -389,7 +411,7 @@ if (!function_exists('session')) {
      * @param mixed  $value session值
      * @return mixed
      */
-    function session($name = '', $value = null)
+    function session($name = '', $value = '')
     {
         if (is_null($name)) {
             // 清除
@@ -478,7 +500,7 @@ if (!function_exists('url')) {
      * @param bool|string $domain 域名
      * @return UrlBuild
      */
-    function url($url = '', $vars = array(), $suffix = true, $domain = false)
+    function url($url = '', $vars = [], $suffix = true, $domain = false)
     {
         return Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain);
     }
@@ -493,7 +515,7 @@ if (!function_exists('validate')) {
      * @param bool         $failException 是否抛出异常
      * @return Validate
      */
-    function validate($validate = '', $message = array(), $batch = false, $failException = true)
+    function validate($validate = '', array $message = [], $batch = false, $failException = true)
     {
         if (is_array($validate) || '' === $validate) {
             $v = new Validate();
@@ -501,12 +523,12 @@ if (!function_exists('validate')) {
                 $v->rule($validate);
             }
         } else {
-            if (strpos($validate, '.') !== false) {
+            if (strpos($validate, '.')) {
                 // 支持场景
                 list($validate, $scene) = explode('.', $validate);
             }
 
-            $class = strpos($validate, '\\') !== false ? $validate : app()->parseClass('validate', $validate);
+            $class = strpos($validate, '\\') ? $validate : app()->parseClass('validate', $validate);
 
             $v = new $class();
 
@@ -528,7 +550,7 @@ if (!function_exists('view')) {
      * @param callable $filter   内容过滤
      * @return \lovely\response\View
      */
-    function view($template = '', $vars = array(), $code = 200, $filter = null)
+    function view($template = '', $vars = [], $code = 200, $filter = null)
     {
         return Response::create($template, 'view', $code)->assign($vars)->filter($filter);
     }
@@ -543,7 +565,7 @@ if (!function_exists('display')) {
      * @param callable $filter  内容过滤
      * @return \lovely\response\View
      */
-    function display($content, $vars = array(), $code = 200, $filter = null)
+    function display($content, $vars = [], $code = 200, $filter = null)
     {
         return Response::create($content, 'view', $code)->isContent(true)->assign($vars)->filter($filter);
     }
@@ -558,7 +580,7 @@ if (!function_exists('xml')) {
      * @param array $options 参数
      * @return \lovely\response\Xml
      */
-    function xml($data = array(), $code = 200, $header = array(), $options = array())
+    function xml($data = [], $code = 200, $header = [], $options = [])
     {
         return Response::create($data, 'xml', $code)->header($header)->options($options);
     }
@@ -603,6 +625,19 @@ if (!function_exists('config_path')) {
     }
 }
 
+if (!function_exists('assets_path')) {
+    /**
+     * 获取web资源根目录
+     *
+     * @param string $path
+     * @return string
+     */
+    function assets_path($path = '')
+    {
+        return app()->getRootPath() . 'assets' . DIRECTORY_SEPARATOR . ($path ? ltrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR : $path);
+    }
+}
+
 if (!function_exists('runtime_path')) {
     /**
      * 获取应用运行时目录
@@ -612,8 +647,7 @@ if (!function_exists('runtime_path')) {
      */
     function runtime_path($path = '')
     {
-        $app = app();
-        return $app->getRuntimePath() . ($path ? $path . DIRECTORY_SEPARATOR : $path);
+        return app()->getRuntimePath() . ($path ? $path . DIRECTORY_SEPARATOR : $path);
     }
 }
 
@@ -626,8 +660,7 @@ if (!function_exists('root_path')) {
      */
     function root_path($path = '')
     {
-        $app = app();
-        return $app->getRootPath() . ($path ? $path . DIRECTORY_SEPARATOR : $path);
+        return app()->getRootPath() . ($path ? $path . DIRECTORY_SEPARATOR : $path);
     }
 }
 ?>
