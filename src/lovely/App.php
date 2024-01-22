@@ -232,7 +232,7 @@ class App extends Container
      */
     public function getService($service)
     {
-        $name = is_string($service) ? $service : $service::class;
+        $name = is_string($service) ? $service : get_class($service);
         $filteredServices = array_filter($this->services, function ($value) use ($name) {
             return $value instanceof $name;
         });
