@@ -142,9 +142,9 @@ class App extends Container
         'session'                 => 'Session',
         'validate'                => 'Validate',
         'view'                    => 'View',
-        'think\DbManager'         => 'Db',
-        'think\LogManager'        => 'Log',
-        'think\CacheManager'      => 'Cache',
+        'lovely\DbManager'         => 'Db',
+        'lovely\LogManager'        => 'Log',
+        'lovely\CacheManager'      => 'Cache',
 
         // 接口依赖注入
         'Psr\Log\LoggerInterface' => 'Log',
@@ -157,7 +157,7 @@ class App extends Container
      */
     public function __construct($rootPath = '')
     {
-        $this->thinkPath   = realpath(dirname(__DIR__)) . DIRECTORY_SEPARATOR;
+        $this->lovelyPath   = realpath(dirname(__DIR__)) . DIRECTORY_SEPARATOR;
         $this->rootPath    = $rootPath ? rtrim($rootPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR : $this->getDefaultRootPath();
         $this->appPath     = $this->rootPath . 'app' . DIRECTORY_SEPARATOR;
         $this->runtimePath = $this->rootPath . 'runtime' . DIRECTORY_SEPARATOR;
@@ -167,7 +167,7 @@ class App extends Container
         }
 
         $this->instance('app', $this);
-        $this->instance('think\Container', $this);
+        $this->instance('lovely\Container', $this);
 
         $this->initialize();
     }
@@ -214,7 +214,7 @@ class App extends Container
             return $this->invoke(array($service, 'boot'));
         }
     }
-
+    
     /**
      * 获取服务
      * @param string|Service $service
@@ -222,11 +222,12 @@ class App extends Container
      */
     public function getService($service)
     {
-        $name = is_string($service) ? $service : $service::class;
-        return array_values(array_filter($this->services, function ($value) use ($name) {
+        $name = is_string($service) ? $service : get_class($service);
+        $filteredServices = array_filter($this->services, function ($value) use ($name) {
             return $value instanceof $name;
-        }, ARRAY_FILTER_USE_BOTH))[0] ?? null;
-    }
+        });
+
+        return count($filteredServices) > 0 ? reset($filteredServices) : null;}
 
     /**
      * 开启应用调试模式
@@ -269,7 +270,7 @@ class App extends Container
      */
     public function version()
     {
-        return ltrim(InstalledVersions::getPrettyVersion('topthink/framework'), 'v');
+        return ltrim(InstalledVersions::getPrettyVersion('lovelyphp/framework'), 'v');
     }
 
 
@@ -336,9 +337,9 @@ class App extends Container
      * @access public
      * @return string
      */
-    public function getThinkPath(): string
+    public function getLovelyPath(): string
     {
-        return $this->thinkPath;
+        return $this->lovelyPath;
     }
 
     /**
@@ -405,34 +406,38 @@ class App extends Container
     public function initialize()
     {
         $this->initialized = true;
-
         $this->beginTime = microtime(true);
         $this->beginMem  = memory_get_usage();
-
         $this->loadEnv($this->envName);
 
-        $this->configExt = $this->env->get('config_ext', '.php');
+    $configExt = $this->env->get('config_ext');
+    $this->configExt = $configExt ? $configExt : '.php';
 
-        $this->debugModeInit();
+    $this->debugModeInit();
 
-        // 加载全局初始化文件
-        $this->load();
+    // 加载全局初始化文件
+    $this->load();
 
-        // 加载应用默认语言包
-        $this->loadLangPack();
+    // 加载应用默认语言包
+    $this->loadLangPack();
 
-        // 监听AppInit
-        $this->event->trigger(AppInit::class);
+    // 监听AppInit
+    $this->event->trigger(AppInit::class);
 
-        date_default_timezone_set($this->config->get('app.default_timezone', 'Asia/Shanghai'));
+    date_default_timezone_set($this->config->get('app.default_timezone', 'Asia/Shanghai'));
 
-        // 初始化
-        foreach ($this->initializers as $initializer) {
-            $this->make($initializer)->init($this);
+    // 初始化
+    foreach ($this->initializers as $initializer) {
+        $initializerInstance = $this->make($initializer);
+        
+        if (method_exists($initializerInstance, 'init')) {
+            $initializerInstance->init($this);
         }
-
-        return $this;
     }
+
+    return $this;
+}
+
 
     /**
      * 是否初始化过
@@ -479,7 +484,7 @@ class App extends Container
             include_once $appPath . 'common.php';
         }
 
-        include_once $this->thinkPath . 'helper.php';
+        include_once $this->lovelyPath . 'helper.php';
 
         $configPath = $this->getConfigPath();
 
@@ -584,6 +589,6 @@ class App extends Container
      */
     protected function getDefaultRootPath(): string
     {
-        return dirname($this->thinkPath, 4) . DIRECTORY_SEPARATOR;
+        return dirname($this->lovelyPath, 4) . DIRECTORY_SEPARATOR;
     }
 }
