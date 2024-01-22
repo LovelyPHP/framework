@@ -1,0 +1,42 @@
+{
+    "name": "lovelyphp/framework",
+    "description": "the LovelyPHP Framework",
+    "type": "framework",
+    "keywords": [
+        "framework",
+        "lovelyphp",
+        "ORM"
+    ],
+    "homepage": "https://lovelyphp.mojy.xyz",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "MoeCinnamo",
+            "email": "abcd2890000456@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.28"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "app\\": "app"
+        },
+        "psr-0": {
+            "": "extend/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist"
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php lovely service:discover",
+            "@php lovely vendor:publish"
+        ]
+    }
+}
