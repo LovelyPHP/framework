@@ -1,6 +1,6 @@
 <?php
 
-namespace think\contract;
+namespace lovely\contract;
 
 interface Jsonable
 {
