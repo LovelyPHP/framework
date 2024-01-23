@@ -310,9 +310,19 @@ class ArrTest extends TestCase
     public function testWhereKey()
     {
         $array = ['10' => 1, 'foo' => 3, 20 => 2];
-        $array = Arr::where($array, function ($value, $key) {
-            return is_numeric($key);
-        });
+
+        if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+            // PHP 5.4 or 5.5
+            $array = Arr::where($array, function ($value) {
+                return is_numeric($value);
+            });
+        } else {
+            // PHP 5.6 and above
+            $array = Arr::where($array, function ($value, $key) {
+                return is_numeric($key);
+            });
+        }
+
         $this->assertSame(['10' => 1, 20 => 2], $array);
     }
 
