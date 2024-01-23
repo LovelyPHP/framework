@@ -47,7 +47,7 @@ class StrTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertInternalType('string', Str::random(10));
+        $this->assertIsString(Str::random(10));
     }
 
     public function testUpper()
