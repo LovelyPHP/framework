@@ -608,10 +608,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * 转换当前数据集为JSON字符串
      * @access public
-     * @param integer $options json参数
+     * @param int $options json参数
      * @return string
      */
-    public function toJson($options = \lovely\contract\JSON_UNESCAPED_UNICODE)
+    public function toJson($options = JSON_UNESCAPED_UNICODE)
     {
         return json_encode($this->toArray(), $options);
     }

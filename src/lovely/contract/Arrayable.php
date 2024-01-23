@@ -4,5 +4,10 @@ namespace lovely\contract;
 
 interface Arrayable
 {
-    public function toArray(): array;
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray();
 }
