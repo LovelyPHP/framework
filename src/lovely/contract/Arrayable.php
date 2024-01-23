@@ -2,6 +2,10 @@
 
 namespace lovely\contract;
 
+if (!defined('ARRAY_FILTER_USE_BOTH')) {
+    define('ARRAY_FILTER_USE_BOTH', 1);
+}
+
 interface Arrayable
 {
     /**

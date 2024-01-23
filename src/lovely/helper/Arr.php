@@ -151,7 +151,7 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        if ($array instanceof \ArrayAccess) {
+        if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
 
