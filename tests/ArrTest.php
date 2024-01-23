@@ -4,6 +4,7 @@ namespace Tests;
 use stdClass;
 use lovely\Collection;
 use lovely\helper\Arr;
+use PHPUnit\Framework\TestCase;
 
 class ArrTest extends TestCase
 {
