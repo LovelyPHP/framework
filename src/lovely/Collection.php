@@ -59,7 +59,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return empty($this->items);
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
