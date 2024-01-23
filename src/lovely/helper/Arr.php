@@ -614,7 +614,11 @@ class Arr
      */
     public static function where($array, callable $callback)
     {
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+            return array_filter($array, $callback);
+        } else {
+            return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        }
     }
 
     /**
