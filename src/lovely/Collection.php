@@ -59,7 +59,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return empty($this->items);
     }
 
-    public function toArray(): array
+    public function toArray()
     {
         return array_map(function ($value) {
             return $value instanceof Arrayable ? $value->toArray() : $value;
@@ -611,7 +611,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param integer $options json参数
      * @return string
      */
-    public function toJson($options = JSON_UNESCAPED_UNICODE): string
+    public function toJson($options = \lovely\contract\JSON_UNESCAPED_UNICODE)
     {
         return json_encode($this->toArray(), $options);
     }
