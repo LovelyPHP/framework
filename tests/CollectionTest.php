@@ -56,9 +56,7 @@ class CollectionTest extends TestCase
     {
         $c = new Collection(['name' => 'Hello', 'age' => 25]);
 
-        $arrayIteratorClass = version_compare(PHP_VERSION, '5.6.0') >= 0 ? \ArrayIterator::class : 'ArrayIterator';
-
-        $this->assertInstanceOf($arrayIteratorClass, $c->getIterator());
+        $this->assertInstanceOf('ArrayIterator', $c->getIterator());
 
         $this->assertSame(['name' => 'Hello', 'age' => 25], $c->getIterator()->getArrayCopy());
     }
