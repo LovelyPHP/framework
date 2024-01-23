@@ -47,7 +47,13 @@ class StrTest extends TestCase
 
     public function testRandom()
     {
-        $this->assertIsString(Str::random(10));
+        // Check PHPUnit version for assertIsString
+        if (method_exists($this, 'assertIsString')) {
+            $this->assertIsString(Str::random(10));
+        } else {
+            // PHPUnit 8 and below
+            $this->assertInternalType('string', Str::random(10));
+        }
     }
 
     public function testUpper()

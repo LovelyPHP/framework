@@ -34,10 +34,18 @@ class ArrTest extends TestCase
         // 3D matrix
         $this->assertSame(
             [
-                [1, 'a', 'I'], [1, 'a', 'II'], [1, 'a', 'III'],
-                [1, 'b', 'I'], [1, 'b', 'II'], [1, 'b', 'III'],
-                [2, 'a', 'I'], [2, 'a', 'II'], [2, 'a', 'III'],
-                [2, 'b', 'I'], [2, 'b', 'II'], [2, 'b', 'III'],
+                [1, 'a', 'I'],
+                [1, 'a', 'II'],
+                [1, 'a', 'III'],
+                [1, 'b', 'I'],
+                [1, 'b', 'II'],
+                [1, 'b', 'III'],
+                [2, 'a', 'I'],
+                [2, 'a', 'II'],
+                [2, 'a', 'III'],
+                [2, 'b', 'I'],
+                [2, 'b', 'II'],
+                [2, 'b', 'III'],
             ],
             Arr::crossJoin([1, 2], ['a', 'b'], ['I', 'II', 'III'])
         );
@@ -253,12 +261,30 @@ class ArrTest extends TestCase
     {
         $randomValue = Arr::random(['foo', 'bar', 'baz']);
         $this->assertContains($randomValue, ['foo', 'bar', 'baz']);
-        $randomValues = Arr::random(['foo', 'bar', 'baz'], 1);
-        $this->assertIsArray($randomValues);
+
+        // Check PHPUnit version for assertIsArray
+        if (method_exists($this, 'assertIsArray')) {
+            $randomValues = Arr::random(['foo', 'bar', 'baz'], 1);
+            $this->assertIsArray($randomValues);
+        } else {
+            // PHPUnit 8 and below
+            $randomValues = Arr::random(['foo', 'bar', 'baz'], 1);
+            $this->assertInternalType('array', $randomValues);
+        }
+
         $this->assertCount(1, $randomValues);
         $this->assertContains($randomValues[0], ['foo', 'bar', 'baz']);
-        $randomValues = Arr::random(['foo', 'bar', 'baz'], 2);
-        $this->assertIsArray($randomValues);
+
+        // Check PHPUnit version for assertIsArray
+        if (method_exists($this, 'assertIsArray')) {
+            $randomValues = Arr::random(['foo', 'bar', 'baz'], 2);
+            $this->assertIsArray($randomValues);
+        } else {
+            // PHPUnit 8 and below
+            $randomValues = Arr::random(['foo', 'bar', 'baz'], 2);
+            $this->assertInternalType('array', $randomValues);
+        }
+
         $this->assertCount(2, $randomValues);
         $this->assertContains($randomValues[0], ['foo', 'bar', 'baz']);
         $this->assertContains($randomValues[1], ['foo', 'bar', 'baz']);
