@@ -17,8 +17,8 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
-//use lovely\contract\Arrayable;
-//use lovely\contract\Jsonable;
+use lovely\contract\Arrayable;
+use lovely\contract\Jsonable;
 use lovely\helper\Arr;
 use Traversable;
 
