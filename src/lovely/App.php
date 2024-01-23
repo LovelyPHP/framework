@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace lovely;
 
-//use Composer\InstalledVersions;
+use Composer\InstalledVersions;
 //use lovely\event\AppInit;
-//use lovely\helper\Str;
+use lovely\helper\Str;
 //use lovely\initializer\BootService;
 //use lovely\initializer\Error;
 //use lovely\initializer\RegisterService;

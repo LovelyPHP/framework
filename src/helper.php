@@ -10,9 +10,9 @@
 // +----------------------------------------------------------------------
 declare(strict_types=1);
 
-//------------------------
-// LovelyPHP 助手函数
-//-------------------------
+//----------------------------
+// LovelyPHP helper function
+//----------------------------
 
 use lovely\App;
 use lovely\Container;
@@ -37,15 +37,15 @@ use lovely\Container;
 //use lovely\response\Xml;
 //use lovely\route\Url as UrlBuild;
 //use lovely\Validate;
-//use lovely\Collection;
-//use lovely\helper\Arr;
+use lovely\Collection;
+use lovely\helper\Arr;
 
 if (!function_exists('abort')) {
     /**
-     * 抛出HTTP异常
-     * @param integer|Response $code    状态码 或者 Response对象实例
-     * @param string           $message 错误信息
-     * @param array            $header  参数
+     * Throw HTTP exception
+     * @param integer|Response $code    Status code or Response object instance
+     * @param string           $message error message
+     * @param array            $header  parameter
      */
     function abort($code, $message = '', $header = [])
     {

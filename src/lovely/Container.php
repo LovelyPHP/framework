@@ -27,7 +27,7 @@ use ReflectionFunctionAbstract;
 use ReflectionMethod;
 //use lovely\exception\ClassNotFoundException;
 //use lovely\exception\FuncNotFoundException;
-//use lovely\helper\Str;
+use lovely\helper\Str;
 use Traversable;
 
 /**
@@ -541,3 +541,4 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
         return new ArrayIterator($this->instances);
     }
 }
+?>
