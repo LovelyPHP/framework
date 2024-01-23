@@ -68,4 +68,3 @@ class CollectionTest extends TestCase
         $this->assertCount(2, $c);
     }
 }
-?>

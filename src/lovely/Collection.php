@@ -611,7 +611,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @param integer $options json参数
      * @return string
      */
-    public function toJson($options = Jsonable::JSON_UNESCAPED_UNICODE): string
+    public function toJson($options = JSON_UNESCAPED_UNICODE): string
     {
         return json_encode($this->toArray(), $options);
     }
@@ -637,4 +637,3 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return (array) $items;
     }
 }
-?>

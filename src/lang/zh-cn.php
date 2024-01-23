@@ -150,4 +150,3 @@ return [
 
     'record has update'                                         => '记录已经被更新啦(* ^ ω ^)',
 ];
-?>

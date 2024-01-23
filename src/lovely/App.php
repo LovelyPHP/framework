@@ -621,4 +621,3 @@ class App extends Container
         return dirname($this->lovelyPath, 4) . DIRECTORY_SEPARATOR;
     }
 }
-?>

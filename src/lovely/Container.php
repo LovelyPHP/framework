@@ -541,4 +541,3 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
         return new ArrayIterator($this->instances);
     }
 }
-?>

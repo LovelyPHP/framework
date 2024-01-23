@@ -62,4 +62,3 @@ class StrTest extends TestCase
         $this->assertSame('USERNAME', Str::upper('userNaMe'));
     }
 }
-?>

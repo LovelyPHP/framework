@@ -366,4 +366,3 @@ class ArrTest extends TestCase
         $this->assertSame([$object], Arr::wrap($object));
     }
 }
-?>

@@ -976,4 +976,3 @@ if (!function_exists('class_uses_recursive')) {
         return array_unique($results);
     }
 }
-?>
