@@ -2,6 +2,7 @@
 namespace Tests;
 
 use lovely\helper\Str;
+use PHPUnit\Framework\TestCase;
 
 class StrTest extends TestCase
 {

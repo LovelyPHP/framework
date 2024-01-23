@@ -2,6 +2,7 @@
 namespace Tests;
 
 use lovely\Collection;
+use PHPUnit\Framework\TestCase;
 
 class CollectionTest extends TestCase
 {
